@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model BusinessSubmission {
+  id                    String    @id @default(cuid())
+
+  // Submission Type
+  submissionType        String    @default("quick") // quick, detailed
+
+  // Business Info
+  businessNameEn        String
+  businessNameDv        String?
+  category              String
+  descriptionEn         String
+  descriptionDv         String?
+
+  // Contact
+  contactPerson         String
+  email                 String
+  phone                 String
+  address               String?
+  website               String?
+  socialMedia           String?   // JSON: {facebook, instagram, twitter}
+
+  // Registration
+  registrationNumber    String?
+  registrationDocument  String?   // File path
+
+  // Additional
+  logo                  String?   // File path
+  additionalDocs        String?   // JSON array of file paths
+  openingHours          String?   // JSON
+  services              String?   // JSON array
+  faqs                  String?   // JSON array
+
+  // Status
+  status                String    @default("pending") // pending, approved, rejected
+  adminNotes            String?
+  reviewedBy            String?
+  reviewedAt            DateTime?
+
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  // Relations
+  reviewer              User?     @relation(fields: [reviewedBy], references: [id])
+}
+
+// Minimal User model reference (already exists in main schema)
+model User {
+  id                  String                 @id
+  name                String?
+  email               String                 @unique
+  businessSubmissions BusinessSubmission[]
+}
